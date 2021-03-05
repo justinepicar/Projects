@@ -104,6 +104,13 @@ the guest user's ID is always 0. Include in your output the name of the
 facility, the name of the member formatted as a single column, and the cost.
 Order by descending cost, and do not use any subqueries. */
 
+SELECT b.facid, b.memid, starttime
+FROM Bookings as b
+LEFT JOIN Members as m
+ON b.memid = m.memid
+LEFT JOIN
+WHERE starttime LIKE '2012-09-14%'
+ORDER BY cost DESC
 
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
