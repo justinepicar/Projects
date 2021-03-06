@@ -136,13 +136,25 @@ ORDER BY total_booking_cost DESC
 
 /* PART 2: SQLite
 
-Export the country club data from PHPMyAdmin, and connect to a local SQLite instance from Jupyter notebook 
-for the following questions.  
+Export the country club data from PHPMyAdmin, and connect to a local SQLite instance from Jupyter notebook for the following questions.  
 
 QUESTIONS:
 /* Q10: Produce a list of facilities with a total revenue less than 1000.
 The output of facility name and total revenue, sorted by revenue. Remember
 that there's a different cost for guests and members! */
+
+SELECT facility, SUM(revenue) AS facility_revenue
+FROM (SELECT f.name as facility,
+             CASE WHEN b.memid = 0 THEN f.guestcost*slots
+             ELSE f.membercost*slots END AS revenue
+      FROM Bookings as b
+      LEFT JOIN Members as m
+      ON b.memid = m.memid
+      LEFT JOIN Facilities as f
+      ON b.facid = f.facid) AS total_booking
+GROUP BY facility
+HAVING facility_revenue < 1000
+ORDER BY SUM(revenue)
 
 /* Q11: Produce a report of members and who recommended them in alphabetic surname,firstname order */
 
