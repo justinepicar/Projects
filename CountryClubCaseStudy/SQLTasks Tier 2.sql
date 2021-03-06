@@ -168,6 +168,17 @@ ORDER BY member_name;
 
 /* Q12: Find the facilities with their usage by member, but not guests */
 
+SELECT member, SUM(used) AS facilities_used
+FROM(SELECT DISTINCT m.memid, firstname || ' ' || surname as member, name as facility,
+        CASE WHEN b.memid = 0 THEN 0
+        ELSE 1 END as used
+     FROM Facilities AS f
+     LEFT JOIN Bookings AS b
+     ON f.facid = b.facid
+     LEFT JOIN Members AS m
+     ON b.memid = m.memid) facility_usage
+WHERE member != 'GUEST GUEST'
+GROUP BY member;
 
 /* Q13: Find the facilities usage by month, but not guests */
 
