@@ -115,7 +115,7 @@ ON b.facid = f.facid
 WHERE starttime LIKE '2012-09-14%'
 AND (CASE WHEN b.memid = 0 THEN guestcost*slots
         ELSE membercost*slots END) > 30
-ORDER BY total_booking_cost DESC
+ORDER BY total_booking_cost DESC;
 
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
@@ -132,7 +132,7 @@ FROM(SELECT starttime, f.name as facility,
      ON b.facid = f.facid) AS total
 WHERE starttime LIKE '2012-09-14%'
 AND total_booking_cost > 30
-ORDER BY total_booking_cost DESC
+ORDER BY total_booking_cost DESC;
 
 /* PART 2: SQLite
 
@@ -154,10 +154,17 @@ FROM (SELECT f.name as facility,
       ON b.facid = f.facid) AS total_booking
 GROUP BY facility
 HAVING facility_revenue < 1000
-ORDER BY SUM(revenue)
+ORDER BY SUM(revenue);
 
 /* Q11: Produce a report of members and who recommended them in alphabetic surname,firstname order */
 
+SELECT m1.surname || ' ' || m1.firstname as member_name,
+        CASE WHEN m1.recommendedby=' ' THEN 'None'
+        ELSE m2.surname || ' ' || m2.firstname END as recommendee_name
+FROM Members as m1
+LEFT JOIN Members as m2
+ON m1.recommendedby = m2.memid
+ORDER BY member_name;
 
 /* Q12: Find the facilities with their usage by member, but not guests */
 
