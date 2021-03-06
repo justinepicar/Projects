@@ -76,10 +76,9 @@ FROM Facilities;
 /* Q6: You'd like to get the first and last name of the last member(s)
 who signed up. Try not to use the LIMIT clause for your solution. */
 
-...try to use a different one that doesn't specify the date
 SELECT surname, firstname
 FROM Members
-WHERE joindate LIKE '2012-09-26%'
+WHERE joindate LIKE '2012-09-26%';
 
 /* Q7: Produce a list of all members who have used a tennis court.
 Include in your output the name of the court, and the name of the member
@@ -95,7 +94,7 @@ LEFT JOIN Facilities AS f
 ON b.facid = f.facid
 WHERE b.facid
 IN ( 0, 1 )
-ORDER BY member_name
+ORDER BY member_name;
 
 /* Q8: Produce a list of bookings on the day of 2012-09-14 which
 will cost the member (or guest) more than $30. Remember that guests have
@@ -104,17 +103,36 @@ the guest user's ID is always 0. Include in your output the name of the
 facility, the name of the member formatted as a single column, and the cost.
 Order by descending cost, and do not use any subqueries. */
 
-SELECT b.facid, b.memid, starttime
+SELECT f.name as facility,
+    CONCAT(m.firstname, ' ', m.surname) as name,
+    CASE WHEN b.memid = 0 THEN guestcost*slots
+        ELSE membercost*slots END AS total_booking_cost
 FROM Bookings as b
 LEFT JOIN Members as m
 ON b.memid = m.memid
-LEFT JOIN
+LEFT JOIN Facilities as f
+ON b.facid = f.facid
 WHERE starttime LIKE '2012-09-14%'
-ORDER BY cost DESC
+AND (CASE WHEN b.memid = 0 THEN guestcost*slots
+        ELSE membercost*slots END) > 30
+ORDER BY total_booking_cost DESC
 
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
 
+SELECT facility, name, total_booking_cost
+FROM(SELECT starttime, f.name as facility,
+     CONCAT(m.firstname, ' ', m.surname) as name,
+     CASE WHEN b.memid = 0 THEN f.guestcost*slots
+     ELSE f.membercost*slots END AS total_booking_cost
+     FROM Bookings as b
+     LEFT JOIN Members as m
+     ON b.memid = m.memid
+     LEFT JOIN Facilities as f
+     ON b.facid = f.facid) AS total
+WHERE starttime LIKE '2012-09-14%'
+AND total_booking_cost > 30
+ORDER BY total_booking_cost DESC
 
 /* PART 2: SQLite
 
