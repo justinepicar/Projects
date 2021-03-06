@@ -167,7 +167,10 @@ ON m1.recommendedby = m2.memid
 ORDER BY member_name;
 
 /* Q12: Find the facilities with their usage by member, but not guests */
+/*question unclear...is this asking total number of uses of each facility by member?
+or is this asking how many facilities are used by each member?*/
 
+/*facilities used by each member*/
 SELECT member, SUM(used) AS facilities_used
 FROM(SELECT DISTINCT m.memid, firstname || ' ' || surname as member, name as facility,
         CASE WHEN b.memid = 0 THEN 0
@@ -180,5 +183,29 @@ FROM(SELECT DISTINCT m.memid, firstname || ' ' || surname as member, name as fac
 WHERE member != 'GUEST GUEST'
 GROUP BY member;
 
+/*total number of uses of each facility by member*/
+SELECT member, facility, SUM(used) AS facilities_usage
+FROM(SELECT m.memid, firstname || ' ' || surname as member, 
+        name as facility,
+        CASE WHEN b.memid = 0 THEN 0
+        ELSE 1 END as used
+        FROM Facilities AS f
+        LEFT JOIN Bookings AS b
+        ON f.facid = b.facid
+        LEFT JOIN Members AS m
+        ON b.memid = m.memid) facility_used
+WHERE member != 'GUEST GUEST'
+GROUP BY facility, member;
+
 /* Q13: Find the facilities usage by month, but not guests */
 
+SELECT month, facility, SUM(used) AS total_usage
+FROM (SELECT strftime('%m', starttime) as month, name as facility, 
+      CASE WHEN b.memid = 0 THEN 0
+      ELSE 1 END as used
+      FROM Facilities AS f
+      LEFT JOIN Bookings AS b
+      ON f.facid = b.facid
+      LEFT JOIN Members AS m
+      ON b.memid = m.memid) AS facilities_used
+GROUP BY month, facility;
