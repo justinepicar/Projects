@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 import pandas as pd
 
-def create_engine(db_file):
+def create_sql_engine(db_file):
     '''
     creates connection to a SQLite database specified by db_file
     :param db_file: database file
@@ -9,10 +9,35 @@ def create_engine(db_file):
     '''
     engine = None
     try:
-        engine = create_engine('sqlite:///sqlite_db_pythonsqlite.db')
+        engine = create_engine(db_file)
+        print('connection established')
     except Error as e:
         print(e)
     return engine
+
+def select_table(engine):
+    '''
+    Query all rows from the table
+    :param conn: connection object
+    :return: None
+    '''
+    # connect to engine
+    con = engine.connect()
+
+    # select table for query
+    query = 'SELECT * FROM FACILITIES'
+
+    # perform queries on selected tables
+    rs = con.execute(query)
+
+    # fetch results
+    rows = rs.fetchall()
+
+    # close connection
+    con.close()
+
+    for row in rows:
+        print(row)
 
 def call_query(engine, query):
     '''
