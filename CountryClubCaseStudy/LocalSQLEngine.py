@@ -12,3 +12,26 @@ def create_engine(db_file):
         engine = create_engine('sqlite:///sqlite_db_pythonsqlite.db')
     except Error as e:
         print(e)
+    return engine
+
+def call_query(engine, query):
+    '''
+    Calls a query from the SQLite database,
+    turn it into a dataframe,
+    and print the result
+    :param query: SQL query
+    :return: df dataframe
+    '''
+    # open engine connection
+    con = engine.connect()
+
+    # perform queries on selected tables
+    rs = con.execute(query)
+
+    # save results in a dataframe
+    df = pd.DataFrame(rs.fetchall())
+
+    # close connection
+    con.close()
+
+    print(df)
